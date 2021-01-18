@@ -1,6 +1,7 @@
 const dbService = require('../../services/db.service')
 const ObjectId = require('mongodb').ObjectId
 const cloneDeep = require('lodash')
+const { emit, broadcast } = require('../../services/socket.service')
 
 
 
@@ -21,7 +22,7 @@ async function getBoard(boardId) {
         const collection = await dbService.getCollection('board')
         const query = { _id: ObjectId(boardId) }
         const board = await collection.find(query).toArray()
-        console.log('boardddd:', board);
+        console.log('board to get:', board);
         return board
     } catch (err) {
         logger.error('cannot find boards', err)
@@ -34,25 +35,37 @@ async function remove(boardId) {
         const collection = await dbService.getCollection('board')
         const query = { _id: ObjectId(boardId) }
         await collection.deleteOne(query)
+
+        // const updatedBoards = query()
+        // emit('delete board', updatedBoards)
+
     } catch (err) {
         logger.error(`cannot remove board ${boardId}`, err)
         throw err
     }
 }
 
-async function update(board, loggedinUser, activity) {
+async function update(board) {
     try {
 
-        let boardToAdd = cloneDeep(board)
-        boardToAdd = _addActivities(boardToAdd, loggedinUser,activity)
 
-        console.log('updating at the service:', boardToAdd);
+        let boardToAdd = { ...board, _id: ObjectId(board._id) }
+        // {boardToAdd,newActivity} = _addActivities(boardToAdd, loggedinUser,activity)
+        
+        // board._id = ObjectId(board._id)
+        // console.log('updating at the service:', board);
 
-        const query = { _id: ObjectId(board._id) } //translating the id from the params to mongo lang
+        // const query = { _id: ObjectId(board._id) } //translating the id from the params to mongo lang
+       
         const collection = await dbService.getCollection('board')
-        await collection.updateOne(query, { $set: boardToAdd })
+        await collection.updateOne({ _id: ObjectId(board._id) }, { $set: boardToAdd })
 
-        console.log("wrong insertion")
+
+
+        // emit('update board', boardToAdd)
+        // emit('add activity', newActivity)
+
+
         return boardToAdd
 
     } catch (err) {
@@ -71,14 +84,14 @@ function _addActivities(boardToAdd, loggedinUser, activity) {
         byMember: loggedinUser
     }
     boardToAdd.activities.unShift(newActivity)
-    return boardToAdd
+    return (boardToAdd, newActivity)
 }
 
 
 
 async function add(board, loggedinUser) {
     try {
-        console.log("Im adding..",board);
+        console.log("Im adding..", board);
         const collection = await dbService.getCollection('board')
         let boardToAdd = _insertDefault(board, loggedinUser)
         let res = await collection.insertOne(boardToAdd)
@@ -109,10 +122,10 @@ function _insertDefault(board, loggedinUser) {
         ...board,
         createdAt: Date.now(),
         createdBy: {
-            username:loggedinUser.username,
-            _id:loggedinUser._id,
-            fullname:loggedinUser.fullname,
-            imgUrl:loggedinUser.imgUrl,
+            username: loggedinUser.username,
+            _id: loggedinUser._id,
+            fullname: loggedinUser.fullname,
+            imgUrl: loggedinUser.imgUrl,
         },
         lists: [
             {
@@ -131,7 +144,7 @@ function _insertDefault(board, loggedinUser) {
                 title: 'Doing',
                 style: {
                     title: {
-                      bgColor: '#4a94f8'
+                        bgColor: '#4a94f8'
                     },
                     bgColor: '#4a94f882'
                 }
@@ -141,10 +154,10 @@ function _insertDefault(board, loggedinUser) {
                 title: 'Done',
                 style: {
                     title: {
-                      bgColor: '#56c991'
+                        bgColor: '#56c991'
                     },
                     bgColor: '#56c99182'
-                  }
+                }
 
             }
         ]

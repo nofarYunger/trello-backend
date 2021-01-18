@@ -24,7 +24,7 @@ async function getBoard(req, res) {
         const boardId = req.params.id
         console.log('boardId:', boardId);
         const board = await boardService.getBoard(boardId)
-        res.send(board)
+        res.send(board[0])
     } catch (err) {
         logger.error(`Failed to get board : ${boardId}`, err)
         res.status(500).send({ err: `Failed to get board : ${boardId}` })
@@ -46,7 +46,7 @@ async function deleteBoard(req, res) {
 
 async function addBoard(req, res) {
     try {
-        const  loggedinUser  = req.session.loggedinUser || gGuest
+        const loggedinUser = req.session.loggedinUser || gGuest
         console.log('session:', loggedinUser);
         const board = req.body
         const boardToAdd = await boardService.add(board, loggedinUser)
@@ -60,13 +60,17 @@ async function addBoard(req, res) {
 
 async function updateBoard(req, res) {
     try {
-        const { board, activity } = req.body
-        const  loggedinUser  = req.session.loggedinUser || gGuest
-
+        console.log('req.body:',req.body);
+        const board  = req.body
+        const loggedinUser = req.session.loggedinUser || gGuest
 
         console.log('board to update:', board);
-        const updatedBoard = await boardService.update(board, loggedinUser, activity)
+
+        const updatedBoard = await boardService.update(board)
+
+        console.log('updated board:', updatedBoard)
         res.send(updatedBoard)
+
     } catch (err) {
         logger.error('Failed to update board', err)
         res.status(500).send({ err: 'Failed to update board' })

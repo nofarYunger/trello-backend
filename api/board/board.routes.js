@@ -5,7 +5,7 @@ const { getBoards, addBoard, updateBoard, getBoard, deleteBoard } = require('./b
 router.get('/', getBoards)
 router.get('/:id', getBoard)
 router.post('/', addBoard)
-router.put('/', updateBoard)
+router.put('/:id', updateBoard)
 router.delete('/:id', deleteBoard)
 
 
