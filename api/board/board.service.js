@@ -49,11 +49,11 @@ async function update(board) {
 
         let boardToAdd = { ...board, _id: ObjectId(board._id) }
         // {boardToAdd,newActivity} = _addActivities(boardToAdd, loggedinUser,activity)
-        
+
         // board._id = ObjectId(board._id)
 
         // const query = { _id: ObjectId(board._id) } //translating the id from the params to mongo lang
-       
+
         const collection = await dbService.getCollection('board')
         await collection.updateOne({ _id: ObjectId(board._id) }, { $set: boardToAdd })
 
@@ -132,7 +132,9 @@ function _insertDefault(board, loggedinUser) {
                         bgColor: '#9895e0'
                     },
                     bgColor: '#9895e082'
-                }
+                },
+                tasks: []
+
 
             },
             {
@@ -143,7 +145,9 @@ function _insertDefault(board, loggedinUser) {
                         bgColor: '#4a94f8'
                     },
                     bgColor: '#4a94f882'
-                }
+                },
+                tasks: []
+
             },
             {
                 id: _makeId(),
@@ -153,10 +157,13 @@ function _insertDefault(board, loggedinUser) {
                         bgColor: '#56c991'
                     },
                     bgColor: '#56c99182'
-                }
+                },
+                tasks: []
+
 
             }
-        ]
+        ],
+        activities: []
     }
 }
 
