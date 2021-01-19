@@ -8,7 +8,6 @@ const logger = require('../../services/logger.service')
 // LOGIN
 async function login(req, res) {
     const credentials = req.body // credentials strucutre: {username: '', password: ''}
-    console.log('Credentials', credentials)
 
     try {
         const user = await userService.login(credentials)//checking if the cred are true
@@ -27,13 +26,11 @@ async function login(req, res) {
 // SIGNUP
 async function signup(req, res) {
     const credentials = req.body  // credentials strucutre: {username: '', password: '', fullname: ''}
-    console.log('creds:', credentials);
     try {
         const user = await userService.signup(credentials)//checking if the cred are free and saving it to the db
         //if we found a user:
         user.loggedinAt = Date.now()
         req.session.loggedinUser = user //saved in an orange balloon (cookie session
-        console.log('session:',req.session);
         res.send(user)
 
     } catch {//if the request failed:
@@ -56,7 +53,6 @@ async function logout(req, res) {
 
 async function getUsers(req, res) {
     const filterBy = req.query?.txt || ''
-    console.log('filterBy:', filterBy);
     try {
         const users = await userService.query(filterBy)
         res.send(users)

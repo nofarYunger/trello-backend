@@ -14,7 +14,7 @@ function emit({ type, data }) {
 function connectSockets(http, session) {
     gIo = require('socket.io')(http, {
         cors: {
-            origin: '*',
+            origin: 'http://localhost:3000',
             methods: ["GET", "POST", "PUT", "DELETE"],
             allowedHeaders: ["my-custom-header"],
             credentials: true
@@ -31,6 +31,14 @@ function connectSockets(http, session) {
     gIo.on('connection', socket => {
         // console.log('socket.handshake', socket.handshake)
         gSocketBySessionIdMap[socket.handshake.sessionID] = socket
+        socket.on('member connection', ({ boardId, username }) => {
+            if (socket.currBoard) {
+                socket.leave(socket.currBoard)
+            }
+            socket.join(boardId)
+            socket.currBoard = boardId
+            socket.broadcast.to(socket.currBoard).emit('member connected', { boardId, username })
+        })
         socket.on('disconnect', socket => {
             console.log('Someone disconnected')
             if (socket.handshake) {
@@ -59,12 +67,11 @@ function connectSockets(http, session) {
         socket.on('is typing', username => {
             console.log('user is typing:', username);
             // gIo.to(socket.myTopic).emit('broadcast','user is typing', username)
-           socket.to(socket.myTopic).emit('user is typing', username)
-           
+            socket.to(socket.myTopic).emit('user is typing', username)
+
             // socket.broadcast.to(room2').emit('message', 'nice game');
 
         })
-
 
     })
 }

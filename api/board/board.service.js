@@ -9,7 +9,6 @@ async function query() {
     try {
         const collection = await dbService.getCollection('board')
         var boards = await collection.find({}).toArray()
-        console.log('boards:', boards);
         return boards
     } catch (err) {
         logger.error('cannot find boards', err)
@@ -22,7 +21,6 @@ async function getBoard(boardId) {
         const collection = await dbService.getCollection('board')
         const query = { _id: ObjectId(boardId) }
         const board = await collection.find(query).toArray()
-        console.log('board to get:', board);
         return board
     } catch (err) {
         logger.error('cannot find boards', err)
@@ -53,7 +51,6 @@ async function update(board) {
         // {boardToAdd,newActivity} = _addActivities(boardToAdd, loggedinUser,activity)
         
         // board._id = ObjectId(board._id)
-        // console.log('updating at the service:', board);
 
         // const query = { _id: ObjectId(board._id) } //translating the id from the params to mongo lang
        
@@ -91,7 +88,6 @@ function _addActivities(boardToAdd, loggedinUser, activity) {
 
 async function add(board, loggedinUser) {
     try {
-        console.log("Im adding..", board);
         const collection = await dbService.getCollection('board')
         let boardToAdd = _insertDefault(board, loggedinUser)
         let res = await collection.insertOne(boardToAdd)
