@@ -55,8 +55,6 @@ http.listen(port, () => {
     logger.info('Server is running on port: ' + port)
 })
 
-// logger.debug([6, 8], 'Papa!')
 
-// console.log('I am Here!, am I?')
 
 

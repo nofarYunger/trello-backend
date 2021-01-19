@@ -22,7 +22,6 @@ async function getBoards(req, res) {
 async function getBoard(req, res) {
     try {
         const boardId = req.params.id
-        console.log('boardId:', boardId);
         const board = await boardService.getBoard(boardId)
         res.send(board[0])
     } catch (err) {
@@ -47,7 +46,6 @@ async function deleteBoard(req, res) {
 async function addBoard(req, res) {
     try {
         const loggedinUser = req.session.loggedinUser || gGuest
-        console.log('session:', loggedinUser);
         const board = req.body
         const boardToAdd = await boardService.add(board, loggedinUser)
         res.send(boardToAdd)
@@ -60,15 +58,12 @@ async function addBoard(req, res) {
 
 async function updateBoard(req, res) {
     try {
-        console.log('req.body:',req.body);
         const board  = req.body
         const loggedinUser = req.session.loggedinUser || gGuest
 
-        console.log('board to update:', board);
 
         const updatedBoard = await boardService.update(board)
 
-        console.log('updated board:', updatedBoard)
         res.send(updatedBoard)
 
     } catch (err) {

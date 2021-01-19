@@ -39,7 +39,6 @@ async function signup({ username, password, fullname, imgUrl }) {
     const hash = await bcrypt.hash(password, saltRounds)
     const userToReturn = _addToData({ username, password: hash, fullname, imgUrl })
     delete userToReturn.password
-    console.log(userToReturn);
     return userToReturn
 }
 
@@ -50,7 +49,6 @@ async function query(filterBy) {
     try {
         const collection = await dbService.getCollection('user')
         var users = await collection.find(criteria).toArray()
-        console.log('filtered users:', users);
         users = users.map(user => {
             delete user.password
             return user
@@ -102,7 +100,6 @@ function _buildCriteria(filterBy) {
             { fullname: txtCriteria }
         ]
     }
-    console.log('criteria:', criteria);
     return criteria
 }
 
@@ -118,7 +115,6 @@ async function _addToData(user) {
             imgUrl: user.imgUrl,
             isAdmin: false
         }
-        console.log('im here now!!', userToAdd);
         const collection = await dbService.getCollection('user')
         await collection.insertOne(userToAdd)
         return userToAdd
