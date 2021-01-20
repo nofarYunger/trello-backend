@@ -1,7 +1,7 @@
 const dbService = require('../../services/db.service')
 const ObjectId = require('mongodb').ObjectId
 const cloneDeep = require('lodash')
-const { emit, broadcast } = require('../../services/socket.service')
+// const { emit, broadcast } = require('../../../frontend/s')
 
 
 
@@ -56,12 +56,6 @@ async function update(board) {
        
         const collection = await dbService.getCollection('board')
         await collection.updateOne({ _id: ObjectId(board._id) }, { $set: boardToAdd })
-
-
-
-        // emit('update board', boardToAdd)
-        // emit('add activity', newActivity)
-
 
         return boardToAdd
 

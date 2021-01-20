@@ -2,9 +2,6 @@ const userService = require('./user.service')
 const logger = require('../../services/logger.service')
 
 
-
-
-
 // LOGIN
 async function login(req, res) {
     const credentials = req.body // credentials strucutre: {username: '', password: ''}

@@ -1,11 +1,10 @@
 const asyncLocalStorage = require('./als.service');
 const logger = require('./logger.service');
-
+const ObjectId = require('mongodb').ObjectId
 
 
 var gIo = null
 var gSocketBySessionIdMap = {}
-
 function emit({ type, data }) {
     gIo.emit(type, data);
 }
@@ -21,23 +20,49 @@ function connectSockets(http, session) {
         }
     });
 
-
-
     const sharedSession = require('express-socket.io-session');
 
     gIo.use(sharedSession(session, {
         autoSave: true
     }));
     gIo.on('connection', socket => {
-        // console.log('socket.handshake', socket.handshake)
         gSocketBySessionIdMap[socket.handshake.sessionID] = socket
-        socket.on('member connection', ({ boardId, username }) => {
+        socket.on('member connected', ({ userId, boardId }) => {
             if (socket.currBoard) {
                 socket.leave(socket.currBoard)
             }
             socket.join(boardId)
+            console.log('socket.boardId', socket.handshake.sessionID);
+
             socket.currBoard = boardId
-            socket.broadcast.to(socket.currBoard).emit('member connected', { boardId, username })
+        })
+        socket.on('do notification', notification => {
+
+            socket.to(socket.currBoard).emit('do notification fs', notification)
+        })
+
+        socket.on('board updated', (updatedBoard) => {
+            console.log('gIo: ', gIo);
+            socket.to(socket.currBoard).emit('board updated fs', updatedBoard)
+        })
+
+        socket.on('task updated', activityTxt => {
+            console.log('activityTxt: ', activityTxt);
+            socket.to(socket.currBoard).emit('task updated fs', activityTxt)
+        })
+
+        socket.on('member joined task', taskId => {
+            socket.join(taskId)
+
+        })
+
+        socket.on('member left task', taskId => {
+            socket.leave(taskId)
+        })
+
+        socket.on('do notification', notification => {
+            console.log('notification: ', notification);
+            socket.to(socket.currBoard).emit('do notification fs', notification)
         })
         socket.on('disconnect', socket => {
             console.log('Someone disconnected')
@@ -45,6 +70,11 @@ function connectSockets(http, session) {
                 gSocketBySessionIdMap[socket.handshake.sessionID] = null
             }
         })
+
+        // socket.on('member added', ({ _id }) => {
+        //     socket.to(socket.currBoard).emit('member added fs', { userId: _id })
+        // })
+
         socket.on('chat topic', topic => { //topic =toy._id
             if (socket.myTopic) {
                 socket.leave(socket.myTopic)
@@ -59,10 +89,7 @@ function connectSockets(http, session) {
             // emits only to sockets in the same room
             console.log('msg:', msg);
             gIo.to(socket.myTopic).emit('chat addMsg', msg)
-
             // save to data:
-
-
         })
         socket.on('is typing', username => {
             console.log('user is typing:', username);

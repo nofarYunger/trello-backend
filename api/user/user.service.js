@@ -2,9 +2,7 @@
 const dbService = require('../../services/db.service')
 const logger = require('../../services/logger.service')
 const bcrypt = require('bcrypt')
-
 const ObjectId = require('mongodb').ObjectId
-
 module.exports = {
     login,
     signup,
@@ -24,7 +22,7 @@ async function login({ username, password }) {
     if (!match) return Promise.reject('Invalid  password')
 
     delete user.password
-    
+
     return user
 }
 
