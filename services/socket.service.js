@@ -41,9 +41,8 @@ function connectSockets(http, session) {
             socket.to(socket.currBoard).emit('do notification fs', notification)
         })
 
-        socket.on('board updated', (updatedBoard) => {
-            console.log('gIo: ', gIo);
-            socket.to(socket.currBoard).emit('board updated fs', updatedBoard)
+        socket.on('board updated', ({ updatedBoard, activity }) => {
+            socket.to(socket.currBoard).emit('board updated fs', { updatedBoard, activity })
         })
 
         socket.on('task updated', activityTxt => {
