@@ -4,10 +4,11 @@ const logger = require('../../services/logger.service')
 
 // LOGIN
 async function login(req, res) {
-    const credentials = req.body // credentials strucutre: {username: '', password: ''}
-
+    const { password, username } = req.query // credentials strucutre: {username: '', password: ''}
+    console.log('password:', password);
+    console.log('username:', username);
     try {
-        const user = await userService.login(credentials)//checking if the cred are true
+        const user = await userService.login({ password, username })//checking if the cred are true
         //if we found a user:
         user.loggedinAt = Date.now()
         req.session.loggedinUser = user //saved in an orange balloon (cookie session)
