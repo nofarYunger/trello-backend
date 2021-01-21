@@ -43,21 +43,20 @@ async function remove(boardId) {
     }
 }
 
-async function update(board) {
+async function update({ board, activity, loggedinUser }) {
     try {
-
-
-        let boardToAdd = { ...board, _id: ObjectId(board._id) }
-        // {boardToAdd,newActivity} = _addActivities(boardToAdd, loggedinUser,activity)
-
-        // board._id = ObjectId(board._id)
-
-        // const query = { _id: ObjectId(board._id) } //translating the id from the params to mongo lang
-
+        const newActivity = {
+            ...activity,
+            id: _makeId(),
+            createdAt: Date.now(),
+            byMember: loggedinUser
+        }
+        
+        const boardToAdd = { ...board, _id: ObjectId(board._id), activities: [newActivity, ...board.activities] }
         const collection = await dbService.getCollection('board')
         await collection.updateOne({ _id: ObjectId(board._id) }, { $set: boardToAdd })
 
-        return boardToAdd
+        return { updatedBoard: boardToAdd, newActivity }
 
     } catch (err) {
         logger.error(`cannot update board ${board._id}`, err)
@@ -74,8 +73,8 @@ function _addActivities(boardToAdd, loggedinUser, activity) {
         createdAt: Date.now(),
         byMember: loggedinUser
     }
-    boardToAdd.activities.unShift(newActivity)
-    return (boardToAdd, newActivity)
+    boardToAdd.activities.unshift(newActivity)
+    return { boardToAdd, newActivity }
 }
 
 

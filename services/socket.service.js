@@ -15,7 +15,6 @@ function connectSockets(http, session) {
         cors: {
             origin: 'http://localhost:3000',
             methods: ["GET", "POST", "PUT", "DELETE"],
-            allowedHeaders: ["my-custom-header"],
             credentials: true
         }
     });
@@ -25,6 +24,7 @@ function connectSockets(http, session) {
     gIo.use(sharedSession(session, {
         autoSave: true
     }));
+
     gIo.on('connection', socket => {
         gSocketBySessionIdMap[socket.handshake.sessionID] = socket
         socket.on('member connected', ({ userId, boardId }) => {
@@ -32,17 +32,15 @@ function connectSockets(http, session) {
                 socket.leave(socket.currBoard)
             }
             socket.join(boardId)
-            console.log('socket.boardId', socket.handshake.sessionID);
-
             socket.currBoard = boardId
         })
-        socket.on('do notification', notification => {
 
+        socket.on('do notification', notification => {
             socket.to(socket.currBoard).emit('do notification fs', notification)
         })
 
-        socket.on('board updated', ({ updatedBoard, activity }) => {
-            socket.to(socket.currBoard).emit('board updated fs', { updatedBoard, activity })
+        socket.on('board updated', ({ updatedBoard, newActivity }) => { 
+            socket.to(updatedBoard._id).emit('board updated fs', { updatedBoard, newActivity })
         })
 
         socket.on('task updated', activityTxt => {

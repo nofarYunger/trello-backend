@@ -1,6 +1,8 @@
 const boardService = require("./board.service");
 const logger = require('../../services/logger.service')
-
+// const {emit} = require('../../services/socket.service')
+const io = require('socket.io-client')
+const socket = io.connect('http://localhost:3031')
 
 const gGuest = {
     username: "Guest",
@@ -30,8 +32,6 @@ async function getBoard(req, res) {
     }
 }
 
-
-
 async function deleteBoard(req, res) {
     try {
         await boardService.remove(req.params.id)
@@ -49,6 +49,7 @@ async function addBoard(req, res) {
         const board = req.body
         const boardToAdd = await boardService.add(board, loggedinUser)
         res.send(boardToAdd)
+
     } catch (err) {
         logger.error('Failed to add board', err)
         res.status(500).send({ err: 'Failed to add board' })
@@ -58,14 +59,12 @@ async function addBoard(req, res) {
 
 async function updateBoard(req, res) {
     try {
-        const board  = req.body
+        const { board, activity } = req.body
         const loggedinUser = req.session.loggedinUser || gGuest
-
-
-        const updatedBoard = await boardService.update(board)
-
+        const { updatedBoard, newActivity } = await boardService.update({ board, activity, loggedinUser })
+        console.log(' activity (afetr asave)', newActivity);
+        socket.emit('board updated', { updatedBoard, newActivity })
         res.send(updatedBoard)
-
     } catch (err) {
         logger.error('Failed to update board', err)
         res.status(500).send({ err: 'Failed to update board' })
