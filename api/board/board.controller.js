@@ -7,7 +7,7 @@ const socket = io.connect('http://localhost:3031')
 const gGuest = {
     username: "Guest",
     fullname: "Guest",
-    imgUrl: "",
+    imgUrl: "https://res.cloudinary.com/nofar/image/upload/v1611336021/psvaqtmh8ithfqe8ah27.png",
     _id: "60055b8847b3113210b3df83",
 }
 
