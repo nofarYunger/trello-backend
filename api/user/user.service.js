@@ -16,10 +16,10 @@ async function login({ username, password }) {
     logger.debug(`auth.service - login with username: ${username}`)
 
     const user = await getByUsername(username)
-    if (!user) return Promise.reject('Invalid username')
+    if (!user) return Promise.resolve(null)
 
     const match = await bcrypt.compare(password, user.password)
-    if (!match) return Promise.reject('Invalid  password')
+    if (!match) return Promise.resolve(null)
 
     delete user.password
 
@@ -35,6 +35,7 @@ async function signup({ username, password, fullname, imgUrl }) {
     logger.debug(`auth.service - signup with username: ${username}, fullname: ${fullname}`)
 
     const hash = await bcrypt.hash(password, saltRounds)
+
     const userToReturn = _addToData({ username, password: hash, fullname, imgUrl })
     delete userToReturn.password
     return userToReturn
@@ -99,7 +100,7 @@ function _buildCriteria(filterBy) {
         ]
     }
     return criteria
-}
+} 
 
 
 
