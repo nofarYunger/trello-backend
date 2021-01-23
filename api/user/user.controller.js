@@ -23,17 +23,40 @@ async function login(req, res) {
 
 // SIGNUP
 async function signup(req, res) {
-    const credentials = req.body  // credentials strucutre: {username: '', password: '', fullname: ''}
+    const { user, isGoogle } = req.body  // credentials strucutre: {username: '', password: '', fullname: '', imgUrl:''}
+console.log('is google:',isGoogle);
+
     try {
-        const user = await userService.signup(credentials)//checking if the cred are free and saving it to the db
-        //if we found a user:
-        user.loggedinAt = Date.now()
-        req.session.loggedinUser = user //saved in an orange balloon (cookie session
-        res.send(user)
+        if (isGoogle) {
+            const { password, username } = user
+            var googleUser = await userService.login({ password, username })
+            req.session.loggedinUser = googleUser //saved in an orange balloon (cookie session
+            console.log('loggedin with google:',googleUser);
+          if(googleUser){
+              delete googleUser.password
+              res.send(googleUser)
+          }
+        }
+
+        if (!isGoogle || !googleUser) {
+            console.log('entered not google');
+            const userToAdd = await userService.signup(user)//checking if the cred are free and saving it to the db
+            //if we found a user:
+            req.session.loggedinUser = userToAdd //saved in an orange balloon (cookie session
+            console.log('signup with google:',userToAdd);
+            delete userToAdd.password
+            res.send(userToAdd)
+        }
+
 
     } catch {//if the request failed:
         res.status(401).send('Invalid username/password')
     }
+}
+
+
+async function loginWithGoogle(){
+    
 }
 
 
