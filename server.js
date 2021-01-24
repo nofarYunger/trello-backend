@@ -1,57 +1,60 @@
-const express = require('express')
-const bodyParser = require('body-parser')
-const cors = require('cors')
-const path = require('path')
-const cookieParser = require('cookie-parser')
-const expressSession = require('express-session')
+const express = require("express");
+const bodyParser = require("body-parser");
+const cors = require("cors");
+const path = require("path");
+const cookieParser = require("cookie-parser");
+const expressSession = require("express-session");
 
-const app = express()
-const http = require('http').createServer(app)
+const app = express();
+const http = require("http").createServer(app);
 
 const session = expressSession({
-    secret: 'coding is amazing',
-    resave: false,
-    saveUninitialized: true,
-    cookie: { secure: false }
-})
+  secret: "coding is amazing",
+  resave: false,
+  saveUninitialized: true,
+  cookie: { secure: false },
+});
 // Express App Config
-app.use(cookieParser())
-app.use(bodyParser.json())
-app.use(session)
+app.use(cookieParser());
+app.use(bodyParser.json({ limit: "50mb" }));
+app.use(session);
 
-if (process.env.NODE_ENV === 'production') {
-    app.use(express.static(path.resolve(__dirname, 'public')))
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.resolve(__dirname, "public")));
 } else {
-    const corsOptions = {
-        origin: ['http://127.0.0.1:8080', 'http://localhost:8080', 'http://127.0.0.1:3000', 'http://localhost:3000'],
-        credentials: true
-    }
-    app.use(cors(corsOptions))
+  const corsOptions = {
+    origin: [
+      "http://127.0.0.1:8080",
+      "http://localhost:8080",
+      "http://127.0.0.1:3000",
+      "http://localhost:3000",
+    ],
+    credentials: true,
+  };
+  app.use(cors(corsOptions));
 }
 
-const userRoutes = require('./api/user/user.routes')
-const boardRoutes = require('./api/board/board.routes')
-const { connectSockets } = require('./services/socket.service')
-
+const userRoutes = require("./api/user/user.routes");
+const boardRoutes = require("./api/board/board.routes");
+const { connectSockets } = require("./services/socket.service");
 
 // routes
-const setupAsyncLocalStorage = require('./middlewares/setupAls.middleware')
-app.all('*', setupAsyncLocalStorage)
+const setupAsyncLocalStorage = require("./middlewares/setupAls.middleware");
+app.all("*", setupAsyncLocalStorage);
 
-app.use('/api/board', boardRoutes)
-app.use('/api/user', userRoutes)
-connectSockets(http, session)
+app.use("/api/board", boardRoutes);
+app.use("/api/user", userRoutes);
+connectSockets(http, session);
 
 // Make every server-side-route to match the index.html
 // so when requesting http://localhost:3000/index.html/car/123 it will still respond with
 // our SPA (single page app) (the index.html file) and allow react-router to take it from there
-app.get('/**', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'))
-})
+app.get("/**", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
+});
 
-const logger = require('./services/logger.service')
-const port = process.env.PORT || 3031
+const logger = require("./services/logger.service");
+const port = process.env.PORT || 3031;
 http.listen(port, () => {
-    logger.info('Server is running on port: ' + port)
-})
-
+  logger.info("Server is running on port: " + port);
+});
