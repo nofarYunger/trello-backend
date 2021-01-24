@@ -62,7 +62,6 @@ async function updateBoard(req, res) {
         const { board, activity } = req.body
         const loggedinUser = req.session.loggedinUser || gGuest
         const { updatedBoard, newActivity } = await boardService.update({ board, activity, loggedinUser })
-        console.log(' activity (afetr asave)', newActivity);
         socket.emit('board updated', { updatedBoard, newActivity })
         res.send(updatedBoard)
     } catch (err) {
