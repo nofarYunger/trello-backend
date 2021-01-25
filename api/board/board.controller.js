@@ -2,7 +2,8 @@ const boardService = require("./board.service");
 const logger = require('../../services/logger.service')
 // const {emit} = require('../../services/socket.service')
 const io = require('socket.io-client')
-const socket = io.connect('http://localhost:3031')
+const baseUrl = (process.env.NODE_ENV === 'production') ? '' : 'http://localhost:3031'
+const socket = io.connect(baseUrl)
 
 const gGuest = {
     username: "Guest",
