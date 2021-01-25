@@ -1,0 +1,20 @@
+{
+    "name": "Chello",
+    "short_name": "Chello",
+    "start_url": ".",
+    "display": "standalone",
+    "background_color": "#fff",
+    "description": "A task managment team app ",
+    "icons": [
+      {
+        "src": "../favicon-32x32.png",
+        "sizes": "32x32",
+        "type": "image/png"
+      },
+      {
+        "src": "../favicon-150x150.png",
+        "sizes": "150x150",
+        "type": "image/png"
+      }
+    ]
+  }
