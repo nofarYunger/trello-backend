@@ -4,7 +4,7 @@ const logger = require("../../services/logger.service");
 const io = require("socket.io-client");
 const baseUrl =
   process.env.NODE_ENV === "production"
-    ? "https://chello-app.herokuapp.com/"
+    ? "https://the-chello-app.herokuapp.com/"
     : "http://localhost:3031";
 const socket = io.connect(baseUrl, { secure: true });
 
