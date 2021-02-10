@@ -39,8 +39,18 @@ function connectSockets(http, session) {
             socket.to(socket.currBoard).emit('do notification fs', notification)
         })
 
-        socket.on('board updated', ({ updatedBoard, newActivity }) => { 
-            socket.to(updatedBoard._id).emit('board updated fs', { updatedBoard, newActivity })
+        // socket.on('board updated', ({ updatedBoard, newActivity }) => {
+        //     socket.to(updatedBoard._id).emit('board updated fs', { updatedBoard, newActivity })
+        // })
+
+        socket.on('board updated', ({ updatedBoard, activity, loggedinUser }) => {
+
+            const newActivity = {
+                ...activity,
+                createdAt: Date.now(),
+                byMember: loggedinUser
+            }
+            socket.to(socket.currBoard).emit('board updated fs', { updatedBoard, newActivity, loggedinUser })
         })
 
         socket.on('task updated', activityTxt => {
