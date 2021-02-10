@@ -24,18 +24,18 @@ async function login(req, res) {
 // SIGNUP
 async function signup(req, res) {
     const { user, isGoogle } = req.body  // credentials strucutre: {username: '', password: '', fullname: '', imgUrl:''}
-console.log('is google:',isGoogle);
+    console.log('is google:', isGoogle);
 
     try {
         if (isGoogle) {
             const { password, username } = user
             var googleUser = await userService.login({ password, username })
             req.session.loggedinUser = googleUser //saved in an orange balloon (cookie session
-            console.log('loggedin with google:',googleUser);
-          if(googleUser){
-              delete googleUser.password
-              res.send(googleUser)
-          }
+            console.log('loggedin with google:', googleUser);
+            if (googleUser) {
+                delete googleUser.password
+                res.send(googleUser)
+            }
         }
 
         if (!isGoogle || !googleUser) {
@@ -43,7 +43,7 @@ console.log('is google:',isGoogle);
             const userToAdd = await userService.signup(user)//checking if the cred are free and saving it to the db
             //if we found a user:
             req.session.loggedinUser = userToAdd //saved in an orange balloon (cookie session
-            console.log('signup with google:',userToAdd);
+            console.log('signup with google:', userToAdd);
             delete userToAdd.password
             res.send(userToAdd)
         }
@@ -55,8 +55,8 @@ console.log('is google:',isGoogle);
 }
 
 
-async function loginWithGoogle(){
-    
+async function loginWithGoogle() {
+
 }
 
 
@@ -93,12 +93,24 @@ async function getUser(req, res) {
     }
 }
 
+async function getLoggedinUser(req, res) {
+    try {
+        console.log('IM HERE!');
+        const loggedinUser = req.session.loggedinUser
+        console.log('loggedinUser: ', loggedinUser);
+        res.send(loggedinUser)
+    } catch (err) {
+        logger.error('Failed to get logged in user', err)
+        res.status(500).send({ err: 'Failed to get user' })
+    }
+}
 
 module.exports = {
     login,
     signup,
     logout,
     getUsers,
+    getLoggedinUser,
     getUser
 
 }

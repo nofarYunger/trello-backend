@@ -1,10 +1,10 @@
 const boardService = require("./board.service");
 const logger = require('../../services/logger.service')
 // const {emit} = require('../../services/socket.service')
-const io = require('socket.io-client')
-const baseUrl = (process.env.NODE_ENV === 'production') ? window.location.hostname
-    : 'http://localhost:3031'
-const socket = io.connect(baseUrl, { secure: true })
+// const io = require('socket.io-client')
+// const baseUrl = (process.env.NODE_ENV === 'production') ? window.location.hostname
+//     : 'http://localhost:3031'
+// const socket = io.connect(baseUrl, { secure: true })
 
 const gGuest = {
     username: "Guest",
@@ -63,8 +63,8 @@ async function updateBoard(req, res) {
     try {
         const { board, activity } = req.body
         const loggedinUser = req.session.loggedinUser || gGuest
-        const { updatedBoard, newActivity } = await boardService.update({ board, activity, loggedinUser })
-        socket.emit('board updated', { updatedBoard, newActivity })
+        const updatedBoard = await boardService.update({ board, activity, loggedinUser })
+        // socket.emit('board updated', { updatedBoard, newActivity })
         res.send(updatedBoard)
     } catch (err) {
         logger.error('Failed to update board', err)
